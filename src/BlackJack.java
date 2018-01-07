@@ -42,7 +42,7 @@ public class BlackJack {
         roundCounter++;
         System.out.println("#Game " + gameCounter + " Round " + roundCounter + " is starting");
         System.out.println("    UserWallet contains " + userWallet);
-        System.out.println("    you lost " + betSize);
+        System.out.println("    User lost " + betSize);
         userWallet -= betSize;
         return userWallet;
 
@@ -65,7 +65,7 @@ public class BlackJack {
 
     private static void initGame() {
         gameCounter++;
-        userBet = 57;
+        userBet = 30;
         userBetTotal = userBet;
         userWallet = 100;
         minimumBet = 10;

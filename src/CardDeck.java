@@ -1,9 +1,9 @@
 import java.util.Scanner;
 
 public class CardDeck {
-    private static final int MAX_CARDS = 13;
-    private static int[][] deckOfCards = new int[MAX_CARDS][4];
-    private static int[] cardValueArray = new int[MAX_CARDS];
+    private static final int CARD_NUMBERS = 13;
+    private static int[][] deckOfCards = new int[CARD_NUMBERS][4];
+    private static int[] cardValueArray = new int[CARD_NUMBERS];
     private static final int HEARTS = 1;
     private static final int DIAMONDS = 2;
     private static final int SPADES = 3;
@@ -17,70 +17,87 @@ public class CardDeck {
     private static int userCardSum = 0;
     private static int dealerCardSum = 0;
     private static int cardValue = 0;
+    private static String USER = "user";
+    private static String DEALER = "dealer";
+    private static boolean doublePlay = false;
+    private static String YES = "y";
+    private static String NO = "n";
+    public static boolean ENDGAME = false;
+    public static boolean CONTINUE = true;
+    public static Scanner userInput = new Scanner(System.in);
+    public static String input = "";
 
 
     public static void main(String[] args) {
-        Scanner userInput = new Scanner(System.in);
-        String yes = "yes";
-        String no = "no";
-        String input = "";
+
+
+
+
+        playMore();
 
         initCards(4);
-        drawCardUser();
-        drawCardDealer();
-        drawCardUser();
-        //  printCardDeckStatus();
-        while (userCardSum == 9 || userCardSum == 10 || userCardSum == 11) {
-            System.out.println("Would you like to play a double down?");
-            input = userInput.nextLine();
-            if (input.compareToIgnoreCase(yes) == 0) {
-                playDouble();
-                //  stop further pathway -> go to Stand
+            userDrawsCard();
+            dealerDrawsCard();
+            userDrawsCard();
+            //  printCardDeckStatus();
+
+            playDouble();
+
+            userBusted();
+            if (!doublePlay) {
+
+                hitFunction();
+                standMode();
             }
-            break;
+
+
+            // loop - waits for userInput to see if it should drawCard or not.
+            //  String answer = userInput.nextLine();
+            //     else - drawCardDealer(); as long as dealerCardSum < 17
         }
-        // loop - waits for userInput to see if it should drawCard or not.
-        System.out.println("\nWould you like to draw a new card?");
-        //  String answer = userInput.nextLine();
-        //     else - drawCardDealer(); as long as dealerCardSum < 17
+
+    private static boolean playMore() {
+        if (userCardSum < 21 && userCardCounter < 5) {
+            return true;
+        }
+        return false;
     }
 
-    private static void playDouble() {         //this should not be in CardDeck?
-        System.out.println("DOUBLE PLAYED");
-        drawCardUser();
 
+    private static void playDouble() {
+         if (userCardSum == 9 || userCardSum == 10 || userCardSum == 11) {
+
+            System.out.println("\nWould you like to play a double down?");
+            System.out.println("DOUBLE PLAYED");
+            input = userInput.nextLine();
+            userDrawsCard();
+            if (input.compareToIgnoreCase(YES) == 0) {
+                doublePlay = true;
+                standMode();
+            }
+
+        }
     }
 
-    private static void removeUsedCard(int cardNumber, int cardSuit) {
-        (deckOfCards[cardNumber][cardSuit]) = deckOfCards[cardNumber][cardSuit] - 1;
-    }
 
-    private static void drawCardUser() {
+    private static void userDrawsCard() {
         userCardCounter++;
-        int cardNumber = randomCardNumber();
-        int cardSuit = randomSuitNumber();
-        cardValue = cardValueArray[cardNumber];
+        drawOneRandomCard();
         userCardSum += cardValue;
-        removeUsedCard(cardNumber, (cardSuit));
-        System.out.println("    Card <" + (cardNumber + 1) + "> <" + getSuit(cardSuit) + "> of the value <" + cardValue + " >has been drawn from user. User now has <" + userCardCounter + "> cards");
         System.out.println("    User card sum is <" + userCardSum + ">");
 
     }
 
-    private static void drawCardDealer() {
+    private static void dealerDrawsCard() {
         dealerCardCounter++;
-        int cardNumber = randomCardNumber();
-        int cardSuit = randomSuitNumber();
-        cardValue = cardValueArray[cardNumber];
+        drawOneRandomCard();
         dealerCardSum += cardValue;
-        removeUsedCard(cardNumber, cardSuit);
-        System.out.println("Card <" + (cardNumber + 1) + "> <" + getSuit(cardSuit) + "> of the value <" + cardValue + "> has been drawn from dealer. Dealer now has <" + dealerCardCounter + "> cards");
         System.out.println("Dealer card sum is <" + dealerCardSum + ">");
 
     }
 
     private static void initCards(int countDecks) {
-        for (int i = 0; i < MAX_CARDS; i++) {
+        for (int i = 0; i < CARD_NUMBERS; i++) {
             for (int j = 0; j < 4; j++) {
                 deckOfCards[i][j] = countDecks;
             }
@@ -128,7 +145,7 @@ public class CardDeck {
 
     private static int randomCardNumber() {
         int randomNumber;
-        randomNumber = (int) Math.floor(Math.random() * 13);
+        randomNumber = (int) Math.floor(Math.random() * CARD_NUMBERS);
         return randomNumber;
     }
 
@@ -137,5 +154,103 @@ public class CardDeck {
         randomNumber = (int) Math.floor(Math.random() * 4);
         return randomNumber;
     }
+
+    private static void drawOneRandomCard() {
+        boolean cardIsValid = false;
+        int cardNumber = 0;
+        int cardSuit = 0;
+
+        while (!cardIsValid) {
+            cardNumber = randomCardNumber();
+            cardSuit = randomSuitNumber();
+            if (deckOfCards[cardNumber][cardSuit] > 0) {
+                //System.out.println((cardNumber + 1) + " " + getSuit(cardSuit) + " "  + deckOfCards[cardNumber][cardSuit] );
+                deckOfCards[cardNumber][cardSuit] = deckOfCards[cardNumber][cardSuit] - 1;
+                cardIsValid = !cardIsValid;
+            }
+        }
+        cardValue = cardValueArray[cardNumber];
+        System.out.println("The drawn card is <" + (cardNumber + 1) + "> < " + getSuit(cardSuit) + "> ");
+
+
+    }
+
+    private static void standMode() {
+        System.out.println("User Total <" + userCardSum + ">");
+        System.out.println("User is now in stand, waiting for dealer moves.");
+        System.out.println("");
+
+        boolean dealerPlaying = true;
+
+        while (dealerPlaying && !ENDGAME) {
+            dealerDrawsCard();
+            dealerBusted();
+
+            if (dealerCardSum > 17) {
+                System.out.println("Dealer Total <" + dealerCardSum + ">");
+                dealerPlaying = false;
+            }
+        }
+        compareTotals();
+    }
+
+    private static void compareTotals() {
+        if (dealerCardSum > userCardSum) {
+            System.out.println("\nUser <" + userCardSum + "> Dealer <" + dealerCardSum + ">");
+            System.out.println("    Dealer wins.");
+               ENDGAME = !ENDGAME;
+        }
+
+        if (userCardSum > dealerCardSum) {
+            System.out.println("\nUser <" + userCardSum + "> Dealer <" + dealerCardSum + ">");
+            System.out.println("User wins");
+            ENDGAME = !ENDGAME ;
+
+        }
+
+        if (userCardSum == dealerCardSum) {
+            System.out.println("\nUser <" + userCardSum + "> Dealer <" + dealerCardSum + ">");
+            System.out.println("Push - nobody wins");
+            ENDGAME = !ENDGAME;
+        }
+
+
+        if (userCardSum == 21 && dealerCardSum != 21) {
+            System.out.println("\n BLACKJACK");
+            System.out.println("    User wins.");
+            ENDGAME = !ENDGAME;
+
+        }
+    }
+
+    private static void hitFunction() {
+        boolean stand = false;
+
+        while ( playMore() && !ENDGAME && !stand) {
+            System.out.println("\nWould you like to draw a new card?");
+            input = userInput.nextLine();
+            if (input.compareToIgnoreCase(YES) == 0) {
+                userDrawsCard();
+                userBusted();
+            } else{
+                stand = !stand;
+            }
+        }
+    }
+
+        private static void userBusted() {
+            if (userCardSum > 21) {
+                System.out.println("User lost!");
+                ENDGAME = true;
+                throw new IllegalArgumentException("User busted " + userCardSum);
+            }
+        }
+        private static void dealerBusted () {
+            if (dealerCardSum > 21) {
+                System.out.println("Dealer lost!");
+                ENDGAME = true;
+                throw new IllegalArgumentException("Dealer busted " + dealerCardSum);
+            }
+        }
 
 }
