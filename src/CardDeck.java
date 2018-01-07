@@ -1,8 +1,9 @@
 import java.util.Scanner;
 
 public class CardDeck {
-    private static int[][] deckOfCards = new int[13][4];
-    private static int[] cardValueArray = new int[13];
+    private static final int MAX_CARDS = 13;
+    private static int[][] deckOfCards = new int[MAX_CARDS][4];
+    private static int[] cardValueArray = new int[MAX_CARDS];
     private static final int HEARTS = 1;
     private static final int DIAMONDS = 2;
     private static final int SPADES = 3;
@@ -16,32 +17,51 @@ public class CardDeck {
     private static int userCardSum = 0;
     private static int dealerCardSum = 0;
     private static int cardValue = 0;
-    private static int cardNumber = 0;
-    private static int cardSuit = 0;
+
 
     public static void main(String[] args) {
+        Scanner userInput = new Scanner(System.in);
+        String yes = "yes";
+        String no = "no";
+        String input = "";
+
         initCards(4);
         drawCardUser();
         drawCardDealer();
         drawCardUser();
-       /* if (userCardSum == 9 || userCardSum == 10 || userCardSum == 11)  {
-            ask user if they want double
-        userInput = yes -> playDouble;
-        userInput = no - > go on
-        }      */
+        //  printCardDeckStatus();
+        while (userCardSum == 9 || userCardSum == 10 || userCardSum == 11) {
+            System.out.println("Would you like to play a double down?");
+            input = userInput.nextLine();
+            if (input.compareToIgnoreCase(yes) == 0) {
+                playDouble();
+                //  stop further pathway -> go to Stand
+            }
+            break;
+        }
         // loop - waits for userInput to see if it should drawCard or not.
-        Scanner userInput = new Scanner(System.in);
-        System.out.println("Would you like to draw a new card?");
+        System.out.println("\nWould you like to draw a new card?");
         //  String answer = userInput.nextLine();
         //     else - drawCardDealer(); as long as dealerCardSum < 17
     }
 
+    private static void playDouble() {         //this should not be in CardDeck?
+        System.out.println("DOUBLE PLAYED");
+        drawCardUser();
+
+    }
+
+    private static void removeUsedCard(int cardNumber, int cardSuit) {
+        (deckOfCards[cardNumber][cardSuit]) = deckOfCards[cardNumber][cardSuit] - 1;
+    }
+
     private static void drawCardUser() {
         userCardCounter++;
-        cardNumber = GetRandom(13);
-        cardSuit = GetRandom(4) + 1;
+        int cardNumber = randomCardNumber();
+        int cardSuit = randomSuitNumber();
         cardValue = cardValueArray[cardNumber];
         userCardSum += cardValue;
+        removeUsedCard(cardNumber, (cardSuit));
         System.out.println("    Card <" + (cardNumber + 1) + "> <" + getSuit(cardSuit) + "> of the value <" + cardValue + " >has been drawn from user. User now has <" + userCardCounter + "> cards");
         System.out.println("    User card sum is <" + userCardSum + ">");
 
@@ -49,18 +69,18 @@ public class CardDeck {
 
     private static void drawCardDealer() {
         dealerCardCounter++;
-        cardNumber = GetRandom(13);
-        cardSuit = GetRandom(4) + 1;
+        int cardNumber = randomCardNumber();
+        int cardSuit = randomSuitNumber();
         cardValue = cardValueArray[cardNumber];
         dealerCardSum += cardValue;
-        System.out.println("    Card <" + (cardNumber + 1) + "> <" + getSuit(cardSuit) + "> of the value <" +  cardValue +  "> has been drawn from dealer. Dealer now has <" + dealerCardCounter + "> cards");
+        removeUsedCard(cardNumber, cardSuit);
+        System.out.println("Card <" + (cardNumber + 1) + "> <" + getSuit(cardSuit) + "> of the value <" + cardValue + "> has been drawn from dealer. Dealer now has <" + dealerCardCounter + "> cards");
         System.out.println("Dealer card sum is <" + dealerCardSum + ">");
 
     }
 
-
     private static void initCards(int countDecks) {
-        for (int i = 0; i < 13; i++) {
+        for (int i = 0; i < MAX_CARDS; i++) {
             for (int j = 0; j < 4; j++) {
                 deckOfCards[i][j] = countDecks;
             }
@@ -75,6 +95,7 @@ public class CardDeck {
 
     private static String getSuit(int suit) {
         String returnValue = "";
+        suit++;
         switch (suit) {
             case HEARTS:
                 returnValue = HEART_STR;
@@ -94,24 +115,26 @@ public class CardDeck {
         return returnValue;
     }
 
-    private static void drawCard(int[][] deckOfCards, int[] cardValueArray) {
-
-    }
-
     private static void printCardDeckStatus() {
-        System.out.println("    deckOfCards values");
+        System.out.println("\ndeckOfCards status");
         for (int i = 0; i <= deckOfCards.length - 1; i++) {
             for (int j = 0; j <= deckOfCards[i].length - 1; j++) {
 
-                System.out.println("Card " + (i + 1) + " " + getSuit(j + 1) + " > " + deckOfCards[i][j] + "<" + cardValueArray[i] + ">");
+                System.out.println("Card " + (i + 1) + " " + getSuit(j) + " > " + deckOfCards[i][j] + " REMAINING, value <" + cardValueArray[i] + ">");
             }
 
         }
     }
 
-    private static int GetRandom(int range) {
+    private static int randomCardNumber() {
         int randomNumber;
-        randomNumber = (int) Math.floor(Math.random() * range);
+        randomNumber = (int) Math.floor(Math.random() * 13);
+        return randomNumber;
+    }
+
+    private static int randomSuitNumber() {
+        int randomNumber;
+        randomNumber = (int) Math.floor(Math.random() * 4);
         return randomNumber;
     }
 
