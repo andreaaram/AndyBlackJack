@@ -1,7 +1,7 @@
 public class BlackJack {
     private static int userBet;
     private static int userBetTotal;
-    private static int userWallet;
+    public static int userWallet;
     private static int minimumBet;
     private static int roundCounter = 0;
     private static int gameCounter = 0;
@@ -43,6 +43,8 @@ public class BlackJack {
         System.out.println("#Game " + gameCounter + " Round " + roundCounter + " is starting");
         System.out.println("    UserWallet contains " + userWallet);
         System.out.println("    User lost " + betSize);
+        CardDeck.startRound();
+
         userWallet -= betSize;
         return userWallet;
 
@@ -82,4 +84,5 @@ public class BlackJack {
         System.out.println("    Minimum bet allowed = " + minimumBet);
 
     }
+
 }
